@@ -11,9 +11,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: Unpack source
         run: |
-          unzip -q source.zip -d temp_folder
-          # Переносим всё из распакованной папки в корень репозитория
-          cp -r temp_folder/* ./ || true
+          mkdir -p temp_extracted
+          unzip -q source.zip -d temp_extracted
+          # Находим, где лежит gradlew внутри архива, и переносим файлы оттуда в корень
+          PROJECT_DIR=$(find temp_extracted -name "gradlew" -exec dirname {} \;)
+          if [ -n "$PROJECT_DIR" ]; then
+            echo "Found project at: $PROJECT_DIR"
+            cp -r "$PROJECT_DIR"/* ./
+          else
+            cp -r temp_extracted/* ./
+          fi
       - name: set up JDK 17
         uses: actions/setup-java@v4
         with:
