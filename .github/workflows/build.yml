@@ -11,16 +11,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Unpack source
         run: |
-          mkdir -p extracted_project
-          unzip -q source.zip -d extracted_project
-          # Находим, где лежит build.gradle или папка app внутри распаковки
-          cd extracted_project
-          SUBDIR=$(find . -maxdepth 2 -name "app" -type d | head -n 1 | xargs dirname)
-          if [ "$SUBDIR" != "." ] && [ -n "$SUBDIR" ]; then
-            cd "$SUBDIR"
-          fi
-          cp -r . ../../
-          cd ../../
+          unzip -q source.zip -d temp_folder
+          # Переносим всё из распакованной папки в корень репозитория
+          cp -r temp_folder/* ./ || true
       - name: set up JDK 17
         uses: actions/setup-java@v4
         with:
